@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -30,10 +29,6 @@ func part1() (int, error) {
 		b1, _ := strconv.ParseInt(pair2[0], 10, 32)
 		b2, _ := strconv.ParseInt(pair2[1], 10, 32)
 
-		if b2 < a1 || a2 < b1 {
-			continue
-		}
-
 		if a1 <= b1 {
 			if between(b1, a1, a2) && between(b2, a1, a2) {
 				score++
@@ -42,7 +37,6 @@ func part1() (int, error) {
 		}
 
 		if between(a1, b1, b2) && between(a2, b1, b2) {
-			fmt.Printf("%v-%v %v-%v\n", a1, a2, b1, b2)
 			score++
 			continue
 		}
