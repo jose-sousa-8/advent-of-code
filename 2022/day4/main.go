@@ -12,10 +12,10 @@ func main() {
 
 	fmt.Printf("Part 1 anwser is: %v\n", p1)
 
-	// p2, err := part2()
-	// if err != nil {
-	// 	fmt.Println("error executing part 2")
-	// }
+	p2, err := part2()
+	if err != nil {
+		fmt.Println("error executing part 2")
+	}
 
-	// fmt.Printf("Part 2 anwser is: %v\n", p2)
+	fmt.Printf("Part 2 anwser is: %v\n", p2)
 }
