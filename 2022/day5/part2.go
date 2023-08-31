@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-func part1() (string, error) {
+func part2() (string, error) {
 	file, err := os.Open("input")
 	if err != nil {
 		return "", err
@@ -54,10 +54,13 @@ func part1() (string, error) {
 		toQueueT, _ := strconv.ParseInt(movements[5], 10, 8)
 		toQueue := int(toQueueT) - 1
 
+		crates := make([]string, qtd)
 		for i := 0; i < qtd; i++ {
 			crat, _ := queues[fromQueue].Dequeue()
-			queues[toQueue].Prepend(crat)
+			crates[i] = crat
 		}
+
+		queues[toQueue].PrependBlock(crates)
 	}
 
 	for i := 0; i < len(queues); i++ {
