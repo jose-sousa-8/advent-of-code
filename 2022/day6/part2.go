@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func part1() int {
+func part2() int {
 	file, err := os.Open("input")
 	if err != nil {
 		return 0
@@ -16,13 +16,19 @@ func part1() int {
 
 	for sc.Scan() {
 		line := sc.Text()
-		for i := 0; i < len(line)-4; i++ {
-			arr := []byte{line[i], line[i+1], line[i+2], line[i+3]}
+		for i := 0; i < len(line)-14; i++ {
+			arr := make([]byte, 14)
+			counter := 0
+			for j := i; j < i+14; j++ {
+				arr[counter] = line[j]
+				counter++
+			}
+
 			if hasDuplicate(arr) {
 				continue
 			}
 
-			return i + 4
+			return i + 14
 		}
 	}
 	return 0
