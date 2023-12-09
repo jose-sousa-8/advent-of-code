@@ -18,3 +18,7 @@ func main() {
 	fmt.Printf("Part 1 anwser is: %v\n", p1)
 	fmt.Printf("Part 2 anwser is: %v", p2)
 }
+
+func isDigit(char byte) bool {
+	return char >= '0' && char <= '9'
+}
