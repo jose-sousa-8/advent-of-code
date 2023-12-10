@@ -63,36 +63,6 @@ func part1() (int, error) {
 	return result, nil
 }
 
-func readGame(line string, g *game) {
-	_gameSets := strings.Split(line, ":")
-	gameId, _ := strconv.Atoi(strings.Split(_gameSets[0], " ")[1])
-	g.id = gameId
-	_sets := strings.Split(_gameSets[1], ";")
-	for _, _set := range _sets {
-		_cubes := strings.Split(_set, ",")
-		red := 0
-		blue := 0
-		green := 0
-		for _, _cube := range _cubes {
-			c := strings.Split(_cube, " ")
-			val, _ := strconv.Atoi(c[1])
-			switch c[2] {
-			case Blue:
-				blue += val
-			case Red:
-				red += val
-			case Green:
-				green += val
-			}
-		}
-		set := set{}
-		set.redCubes = red
-		set.greenCubes = green
-		set.blueCubes = blue
-		g.sets = append(g.sets, set)
-	}
-}
-
 func part2() (int, error) {
 	file, err := os.Open("input")
 	if err != nil {
@@ -127,4 +97,34 @@ func part2() (int, error) {
 	}
 
 	return result, nil
+}
+
+func readGame(line string, g *game) {
+	_gameSets := strings.Split(line, ":")
+	gameId, _ := strconv.Atoi(strings.Split(_gameSets[0], " ")[1])
+	g.id = gameId
+	_sets := strings.Split(_gameSets[1], ";")
+	for _, _set := range _sets {
+		_cubes := strings.Split(_set, ",")
+		red := 0
+		blue := 0
+		green := 0
+		for _, _cube := range _cubes {
+			c := strings.Split(_cube, " ")
+			val, _ := strconv.Atoi(c[1])
+			switch c[2] {
+			case Blue:
+				blue += val
+			case Red:
+				red += val
+			case Green:
+				green += val
+			}
+		}
+		set := set{}
+		set.redCubes = red
+		set.greenCubes = green
+		set.blueCubes = blue
+		g.sets = append(g.sets, set)
+	}
 }
