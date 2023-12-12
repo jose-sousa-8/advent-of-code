@@ -58,7 +58,8 @@ func part2() (int, error) {
 	gameSet := gameSet{}
 	for sc.Scan() {
 		line := sc.Text()
-		cardId, _ := strconv.Atoi(strings.Split(strings.Split(line, ":")[0], " ")[1])
+		c := trim(strings.Split(strings.Split(line, ":")[0], " "))[1]
+		cardId, _ := strconv.Atoi(c)
 		numbers := strings.Split(strings.Split(line, ":")[1], "|")
 		winningNumbers := convert(strings.Split(numbers[0], " "))
 		playerNumbers := convert(strings.Split(numbers[1], " "))
@@ -75,6 +76,18 @@ func part2() (int, error) {
 	}
 
 	return numberOfCards(gameSet), nil
+}
+
+func trim(arr []string) []string {
+	var res = []string{}
+
+	for i := 0; i < len(arr); i++ {
+		if arr[i] != "" && arr[i] != " " {
+			res = append(res, arr[i])
+		}
+	}
+
+	return res
 }
 
 func numberOfCards(game gameSet) int {
