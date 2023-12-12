@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"unicode"
 )
+
+const symbol = -1
+const dot = -2
 
 type point struct {
 	x int
@@ -27,7 +31,7 @@ func part1() (int, error) {
 		for _, rowNumber := range rowNumbers {
 			for _, indice := range rowNumber.indices {
 				adjacents := getAdjacents(matrix, indice.x, indice.y)
-				if contains(adjacents, -2) {
+				if hasSymbol(adjacents) {
 					sum += rowNumber.value
 					break
 				}
@@ -38,9 +42,9 @@ func part1() (int, error) {
 	return sum, nil
 }
 
-func contains(s []int, e int) bool {
+func hasSymbol(s []int) bool {
 	for _, a := range s {
-		if a == e {
+		if a == symbol {
 			return true
 		}
 	}
@@ -55,9 +59,17 @@ func readRowNumbers(matrix [][]int, row int) []rowNumber {
 	previous := []int{}
 	number := rowNumber{}
 	for i := 0; i < len(rowSlice); i++ {
-		if rowSlice[i] > 0 {
+		if rowSlice[i] >= 0 {
 			previous = append(previous, rowSlice[i])
 			number.indices = append(number.indices, point{x: row, y: i})
+			if i == len(rowSlice)-1 {
+				val := previous[0]
+				for i := 1; i < len(previous); i++ {
+					val = val*10 + previous[i]
+				}
+				number.value = val
+				rowNumbers = append(rowNumbers, number)
+			}
 			continue
 		}
 
@@ -93,27 +105,25 @@ func createMatrix() [][]int {
 		line := sc.Text()
 		slice := []int{}
 		for _, char := range line {
-			if isDigit(char) {
+			if unicode.IsDigit(char) {
 				num, _ := strconv.Atoi(string(char))
 				slice = append(slice, num)
 				continue
 			}
 			if char == '.' {
-				slice = append(slice, -1)
+				slice = append(slice, dot)
 				continue
 			}
 
-			slice = append(slice, -2)
+			slice = append(slice, symbol)
 		}
 
 		matrix = append(matrix, slice)
 	}
 
-	return matrix
-}
+	fmt.Println(matrix)
 
-func isDigit(char rune) bool {
-	return char >= '0' && char <= '9'
+	return matrix
 }
 
 func getAdjacents(matrix [][]int, x int, y int) []int {
