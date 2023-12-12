@@ -258,6 +258,7 @@ func createMatrix2() [][]int {
 	return matrix
 }
 
+// could be greatly improved >D
 func getAdjacents(matrix [][]int, x int, y int) []int {
 	result := []int{}
 	if x == 0 {
