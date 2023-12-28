@@ -14,23 +14,10 @@ type _map struct {
 	length      int
 }
 
-func part1() (int, error) {
-	file, err := os.Open("input1")
-	if err != nil {
-		fmt.Printf("Error reading file %v", file.Name())
-	}
+const MaxUint = ^uint(0)
+const MaxInt = int(MaxUint >> 1)
 
-	defer file.Close()
-
-	sc := bufio.NewScanner(file)
-
-	var input []string
-	for sc.Scan() {
-		line := sc.Text()
-		input = append(input, line)
-	}
-
-	seeds := readSeeds(input)
+func readMaps(input []string) [][]_map {
 	var maps = make([][]_map, 7)
 	maps[0] = append(maps[0], readMap(input, "seed-to-soil")...)
 	maps[1] = append(maps[1], readMap(input, "soil-to-fertilizer")...)
@@ -39,34 +26,11 @@ func part1() (int, error) {
 	maps[4] = append(maps[4], readMap(input, "light-to-temperature")...)
 	maps[5] = append(maps[5], readMap(input, "temperature-to-humidity")...)
 	maps[6] = append(maps[6], readMap(input, "humidity-to-location")...)
-
-	const MaxUint = ^uint(0)
-	const MaxInt = int(MaxUint >> 1)
-
-	result := MaxInt
-	fmt.Println("maps:", maps)
-	for _, seed := range seeds {
-		next := seed
-		for _, m := range maps {
-			for _, _map := range m {
-				found, destination := isInMap(next, _map)
-				if found {
-					next = destination
-					break
-				}
-			}
-		}
-
-		if next < result {
-			result = next
-		}
-	}
-
-	return result, nil
+	return maps
 }
 
 func isInMap(value int, m _map) (bool, int) {
-	if value < m.source || value > m.source+m.length {
+	if value < m.source || value >= m.source+m.length {
 		return false, -1
 	}
 
@@ -108,34 +72,30 @@ func convert(in []string) []int {
 	return numbers
 }
 
-func part2() (float64, error) {
-	file, err := os.Open("input1")
-	if err != nil {
-		fmt.Printf("Error reading file %v", file.Name())
-	}
-
-	defer file.Close()
-
-	sc := bufio.NewScanner(file)
-
-	result := float64(0)
-	var input []string
-	for sc.Scan() {
-		line := sc.Text()
-		input = append(input, line)
-	}
-
-	seeds := readSeeds(input)
-	fmt.Println(seeds)
-	return result, nil
-}
-
-func readSeeds(input []string) []int {
+func readSeeds1(input []string) []int {
 	var seeds []int
 	for _, l := range input {
 		if strings.Contains(l, "seeds:") {
 			seedsStr := trim(strings.Split(strings.Split(l, ":")[1], " "))
 			return convert(seedsStr)
+		}
+	}
+
+	return seeds
+}
+
+func readSeeds2(input []string) []_map {
+	var seeds []_map
+	for _, l := range input {
+		if strings.Contains(l, "seeds:") {
+			seedsStr := trim(strings.Split(strings.Split(l, ":")[1], " "))
+			for i := 0; i < len(seedsStr)-1; i++ {
+				if i%2 == 0 {
+					source, _ := strconv.Atoi(seedsStr[i])
+					length, _ := strconv.Atoi(seedsStr[i+1])
+					seeds = append(seeds, _map{source: source, length: length})
+				}
+			}
 		}
 	}
 
@@ -152,4 +112,101 @@ func trim(arr []string) []string {
 	}
 
 	return res
+}
+
+func part1() (int, error) {
+	file, err := os.Open("input1")
+	if err != nil {
+		fmt.Printf("Error reading file %v", file.Name())
+	}
+
+	defer file.Close()
+
+	sc := bufio.NewScanner(file)
+
+	var input []string
+	for sc.Scan() {
+		line := sc.Text()
+		input = append(input, line)
+	}
+
+	seeds := readSeeds1(input)
+	maps := readMaps(input)
+
+	result := MaxInt
+	for _, seed := range seeds {
+		next := seed
+		for _, m := range maps {
+			for _, _map := range m {
+				found, destination := isInMap(next, _map)
+				if found {
+					next = destination
+					break
+				}
+			}
+		}
+
+		if next < result {
+			result = next
+		}
+	}
+
+	return result, nil
+}
+
+func part2() (int, error) {
+	file, err := os.Open("input1")
+	if err != nil {
+		fmt.Printf("Error reading file %v", file.Name())
+	}
+
+	defer file.Close()
+
+	sc := bufio.NewScanner(file)
+
+	var input []string
+	for sc.Scan() {
+		line := sc.Text()
+		input = append(input, line)
+	}
+
+	seeds := readSeeds2(input)
+	maps := readMaps(input)
+	result := MaxInt
+
+	channel := make(chan int)
+
+	for _, seed := range seeds {
+		go func(seed _map, maps [][]_map, channel chan int) {
+			fmt.Println("starting seed range ", seed)
+			var r = MaxInt
+			for i := seed.source; i < seed.source+seed.length; i++ {
+				var next = i
+				for j := 0; j < len(maps); j++ {
+					for _, _map := range maps[j] {
+						found, destination := isInMap(next, _map)
+						if found {
+							next = destination
+							break
+						}
+					}
+				}
+				if next < r {
+					r = next
+				}
+			}
+
+			channel <- r
+			fmt.Println("finished seed range ", seed, r)
+		}(seed, maps, channel)
+	}
+
+	for i := 0; i < len(seeds); i++ {
+		res := <-channel
+		if res < result {
+			result = res
+		}
+	}
+
+	return result, nil
 }
