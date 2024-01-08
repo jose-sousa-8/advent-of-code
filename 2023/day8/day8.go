@@ -9,13 +9,6 @@ import (
 
 var pattern = `(\w+) = \(([^,]+), ([^)]+)\)`
 
-type node struct {
-	left     string
-	right    string
-	value    string
-	stepsToZ int
-}
-
 func part1() (int, error) {
 	buffer, _ := os.ReadFile("1.txt")
 
